@@ -7,6 +7,7 @@ import rev
 from swervepy import u
 from swervepy.impl import Falcon500CoaxialDriveComponent, Falcon500CoaxialAzimuthComponent, PigeonGyro, \
     CoaxialSwerveModule, AbsoluteCANCoder, NEOCoaxialDriveComponent, NEOCoaxialAzimuthComponent
+from swervepy.impl.sensor import Pigeon2Gyro, SparkMaxEncoderType
 from wpimath.geometry import Translation2d, Rotation2d
 
 
@@ -113,27 +114,27 @@ def dev_2024():
             invert_motor=True,
         )
 
-        GYRO = PigeonGyro(0, True)
+        GYRO = Pigeon2Gyro(0, False)
 
         MODULES = (
             CoaxialSwerveModule(
                 NEOCoaxialDriveComponent(1, DRIVE_PARAMS),
-                NEOCoaxialAzimuthComponent(2, Rotation2d.fromDegrees(0), AZIMUTH_PARAMS, AbsoluteCANCoder(1)),
+                NEOCoaxialAzimuthComponent(2, Rotation2d.fromDegrees(0), AZIMUTH_PARAMS, SparkMaxEncoderType.ANALOG),
                 Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
             ),
             CoaxialSwerveModule(
                 NEOCoaxialDriveComponent(3, DRIVE_PARAMS),
-                NEOCoaxialAzimuthComponent(4, Rotation2d.fromDegrees(0), AZIMUTH_PARAMS, AbsoluteCANCoder(2)),
+                NEOCoaxialAzimuthComponent(4, Rotation2d.fromDegrees(0), AZIMUTH_PARAMS, SparkMaxEncoderType.ANALOG),
                 Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
             ),
             CoaxialSwerveModule(
                 NEOCoaxialDriveComponent(5, DRIVE_PARAMS),
-                NEOCoaxialAzimuthComponent(6, Rotation2d.fromDegrees(0), AZIMUTH_PARAMS, AbsoluteCANCoder(3)),
+                NEOCoaxialAzimuthComponent(6, Rotation2d.fromDegrees(0), AZIMUTH_PARAMS, SparkMaxEncoderType.ANALOG),
                 Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
             ),
             CoaxialSwerveModule(
                 NEOCoaxialDriveComponent(7, DRIVE_PARAMS),
-                NEOCoaxialAzimuthComponent(8, Rotation2d.fromDegrees(0), AZIMUTH_PARAMS, AbsoluteCANCoder(4)),
+                NEOCoaxialAzimuthComponent(8, Rotation2d.fromDegrees(0), AZIMUTH_PARAMS, SparkMaxEncoderType.ANALOG),
                 Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2),
             ),
         )
