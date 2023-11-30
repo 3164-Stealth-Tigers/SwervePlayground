@@ -154,7 +154,7 @@ def get_robot_specific_options():
     # Load robot identifier from file
     try:
         with open(Path(__file__).resolve().parent / "ROBOT_ID", "r") as f:
-            tag = f.read()
+            tag = f.read().strip()
     except OSError:
         raise Exception("ROBOT_ID does not exist or is malformed. Use deploy script with an argument to set ROBOT_ID.")
 

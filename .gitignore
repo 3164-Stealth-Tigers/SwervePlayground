@@ -171,5 +171,5 @@ networktables.json
 .installer_config
 .deploy_cfg
 
-swervelib/
+swervepy/
 ROBOT_ID

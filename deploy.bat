@@ -3,6 +3,6 @@
 :: The ID value is the sole argument to this script.
 
 @echo off
-echo %* > src\ROBOT_ID
+>src\ROBOT_ID echo %*
 python src\robot.py deploy
 del src\ROBOT_ID
