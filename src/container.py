@@ -1,6 +1,7 @@
 import math
 
 import commands2
+import wpilib
 import wpimath.trajectory
 from wpimath.geometry import Pose2d
 
@@ -15,7 +16,7 @@ from oi import XboxDriver, T16000M
 class RobotContainer:
     def __init__(self):
         # Driver Xbox controller
-        self.stick = T16000M(DRIVER_JOYSTICK)
+        self.stick = XboxDriver(DRIVER_JOYSTICK)
 
         # Load configs for the specific robot this code is deployed to
         # Determined by a value set in the ROBOT_ID file
@@ -34,6 +35,7 @@ class RobotContainer:
         # The teleop command will run whenever no other command is running on the Swerve subsystem
         # (e.g., autonomous, ski stop)
         self.swerve.setDefaultCommand(self.teleop_command)
+        wpilib.SmartDashboard.putData(self.teleop_command)
 
         self.configure_button_bindings()
 

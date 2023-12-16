@@ -118,7 +118,7 @@ class T16000M(DriverActionSet):
         return deadband(-self.stick.getRawAxis(0), 0.001)
 
     def turn(self) -> float:
-        return deadband(-self.stick.getRawAxis(2), 0.001) * 0.6
+        return deadband(-self.stick.getRawAxis(2), 0.1) * 0.6
 
     @property
     def reset_gyro(self) -> Trigger:

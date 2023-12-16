@@ -28,7 +28,7 @@ def comp_2023():
             peak_current_limit=60,
             peak_current_duration=0.01,
             neutral_mode=ctre.NeutralMode.Coast,
-            kP=0.12465,
+            kP=0.1,
             kI=0,
             kD=0,
             kS=0.16954 / 12,
@@ -50,7 +50,7 @@ def comp_2023():
             invert_motor=True,
         )
 
-        GYRO = PigeonGyro(0, True)
+        GYRO = PigeonGyro(0, False)
 
         MODULES = (
             CoaxialSwerveModule(
@@ -81,8 +81,8 @@ def dev_2024():
     class Inner:
         TRACK_WIDTH = (24.75 * u.inch).m_as(u.m)
         WHEEL_BASE = (24.75 * u.inch).m_as(u.m)
-        MAX_VELOCITY = 1 * (u.m / u.s)  # TODO: Measure
-        MAX_ANGULAR_VELOCITY = 1 * (u.deg / u.s)  # TODO: Measure
+        MAX_VELOCITY = 4 * (u.m / u.s)  # TODO: Measure
+        MAX_ANGULAR_VELOCITY = 584 * (u.deg / u.s)  # TODO: Measure
 
         DRIVE_PARAMS = NEOCoaxialDriveComponent.Parameters(
             wheel_circumference=4 * math.pi * u.inch,
@@ -93,7 +93,7 @@ def dev_2024():
             continuous_current_limit=40,
             peak_current_limit=60,
             neutral_mode=rev.CANSparkMax.IdleMode.kCoast,
-            kP=0,  # TODO: Characterize drivetrain
+            kP=0.1,  # TODO: Characterize drivetrain
             kI=0,
             kD=0,
             kS=0,
@@ -108,7 +108,7 @@ def dev_2024():
             continuous_current_limit=25,
             peak_current_limit=40,
             neutral_mode=rev.CANSparkMax.IdleMode.kBrake,
-            kP=0.3,
+            kP=0.01,
             kI=0,
             kD=0,
             invert_motor=True,
@@ -119,22 +119,22 @@ def dev_2024():
         MODULES = (
             CoaxialSwerveModule(
                 NEOCoaxialDriveComponent(1, DRIVE_PARAMS),
-                NEOCoaxialAzimuthComponent(2, Rotation2d.fromDegrees(0), AZIMUTH_PARAMS, SparkMaxEncoderType.ANALOG),
+                NEOCoaxialAzimuthComponent(2, Rotation2d.fromDegrees(107.226562), AZIMUTH_PARAMS, AbsoluteCANCoder(1)),
                 Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
             ),
             CoaxialSwerveModule(
                 NEOCoaxialDriveComponent(3, DRIVE_PARAMS),
-                NEOCoaxialAzimuthComponent(4, Rotation2d.fromDegrees(0), AZIMUTH_PARAMS, SparkMaxEncoderType.ANALOG),
+                NEOCoaxialAzimuthComponent(4, Rotation2d.fromDegrees(160.136719), AZIMUTH_PARAMS, AbsoluteCANCoder(2)),
                 Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
             ),
             CoaxialSwerveModule(
                 NEOCoaxialDriveComponent(5, DRIVE_PARAMS),
-                NEOCoaxialAzimuthComponent(6, Rotation2d.fromDegrees(0), AZIMUTH_PARAMS, SparkMaxEncoderType.ANALOG),
+                NEOCoaxialAzimuthComponent(6, Rotation2d.fromDegrees(307.089844), AZIMUTH_PARAMS, AbsoluteCANCoder(3)),
                 Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
             ),
             CoaxialSwerveModule(
                 NEOCoaxialDriveComponent(7, DRIVE_PARAMS),
-                NEOCoaxialAzimuthComponent(8, Rotation2d.fromDegrees(0), AZIMUTH_PARAMS, SparkMaxEncoderType.ANALOG),
+                NEOCoaxialAzimuthComponent(8, Rotation2d.fromDegrees(355.693359), AZIMUTH_PARAMS, AbsoluteCANCoder(4)),
                 Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2),
             ),
         )
