@@ -2,12 +2,12 @@ import math
 from functools import cache
 from pathlib import Path
 
-import ctre
+import phoenix5
 import rev
 from swervepy import u
 from swervepy.impl import Falcon500CoaxialDriveComponent, Falcon500CoaxialAzimuthComponent, PigeonGyro, \
     CoaxialSwerveModule, AbsoluteCANCoder, NEOCoaxialDriveComponent, NEOCoaxialAzimuthComponent
-from swervepy.impl.sensor import Pigeon2Gyro, SparkMaxEncoderType
+from swervepy.impl.sensor import Pigeon2Gyro
 from wpimath.geometry import Translation2d, Rotation2d
 
 
@@ -27,7 +27,7 @@ def comp_2023():
             continuous_current_limit=40,
             peak_current_limit=60,
             peak_current_duration=0.01,
-            neutral_mode=ctre.NeutralMode.Coast,
+            neutral_mode=phoenix5.NeutralMode.Coast,
             kP=0.1,
             kI=0,
             kD=0,
@@ -43,7 +43,7 @@ def comp_2023():
             continuous_current_limit=25,
             peak_current_limit=40,
             peak_current_duration=0.01,
-            neutral_mode=ctre.NeutralMode.Brake,
+            neutral_mode=phoenix5.NeutralMode.Brake,
             kP=0.3,
             kI=0,
             kD=0,
@@ -141,11 +141,18 @@ def dev_2024():
     return Inner()
 
 
+def comp_2024():
+    class Inner:
+        pass
+    return Inner()
+
+
 # Dictionary of robot ID values possible in the ROBOT_ID file. Each key's value is a function that returns a class of
 # constants
 OPTIONS = {
     "0": comp_2023,
-    "1": dev_2024
+    "1": dev_2024,
+    "2": comp_2024,
 }
 
 
@@ -153,7 +160,7 @@ OPTIONS = {
 def get_robot_specific_options():
     # Load robot identifier from file
     try:
-        with open(Path(__file__).resolve().parent / "ROBOT_ID", "r") as f:
+        with open(Path(__file__).resolve().parent.parent / "ROBOT_ID", "r") as f:
             tag = f.read().strip()
     except OSError:
         raise Exception("ROBOT_ID does not exist or is malformed. Use deploy script with an argument to set ROBOT_ID.")

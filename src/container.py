@@ -1,16 +1,12 @@
-import math
-
 import commands2
 import wpilib
-import wpimath.trajectory
-from wpimath.geometry import Pose2d
 
-from swervepy import u, SwerveDrive, TrajectoryFollowerParameters
+from swervepy import SwerveDrive
 
-import switchable_options
+from config import switchable_options
 from commands.swerve import ski_stop_command
-from global_options import *
-from oi import XboxDriver, T16000M
+from config.global_options import *
+from oi import XboxDriver
 
 
 class RobotContainer:
@@ -40,25 +36,7 @@ class RobotContainer:
         self.configure_button_bindings()
 
     def get_autonomous_command(self):
-        follower_params = TrajectoryFollowerParameters(
-            target_angular_velocity=math.pi * (u.rad / u.s),
-            target_angular_acceleration=math.pi * (u.rad / (u.s * u.s)),
-            theta_kP=1,
-            x_kP=1,
-            y_kP=1,
-        )
-
-        trajectory_config = wpimath.trajectory.TrajectoryConfig(maxVelocity=4.5, maxAcceleration=1)
-
-        trajectory = wpimath.trajectory.TrajectoryGenerator.generateTrajectory(
-            [
-                Pose2d(0, 0, 0),  # Start at (0, 0)
-                Pose2d(1, 0, 0),  # Move 1m forward
-            ],
-            trajectory_config,
-        )
-
-        return self.swerve.follow_trajectory_command(trajectory, follower_params, True)
+        return commands2.PrintCommand("Autonomous not implemented!")
 
     def configure_button_bindings(self):
         """Bind buttons on the Xbox controllers to run Commands"""

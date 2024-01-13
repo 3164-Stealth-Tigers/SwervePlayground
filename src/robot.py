@@ -20,7 +20,3 @@ class Robot(commands2.TimedCommandRobot):
     def teleopInit(self) -> None:
         if self.autonomous_command:
             self.autonomous_command.cancel()
-
-
-if __name__ == "__main__":
-    wpilib.run(Robot)

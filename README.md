@@ -4,3 +4,4 @@ Run `deploy.bat {id}` and replace `{id}` with one of the values from the table b
 |----|------------------------|
 | 0  | 2023 Comp Bot "PoG"    |
 | 1  | 2024 Offseason Dev Bot |
+| 2  | 2024 Comp Bot          |

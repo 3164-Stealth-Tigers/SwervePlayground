@@ -3,6 +3,9 @@
 :: The ID value is the sole argument to this script.
 
 @echo off
->src\ROBOT_ID echo %*
-python src\robot.py deploy
-del src\ROBOT_ID
+set original-dir=%CD%
+cd %~dp0\src
+>ROBOT_ID echo %1
+python -m robotpy deploy --skip-tests
+del ROBOT_ID
+cd %original_dir%

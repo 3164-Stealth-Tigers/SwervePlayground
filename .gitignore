@@ -170,6 +170,7 @@ simgui*.json
 networktables.json
 .installer_config
 .deploy_cfg
+.wpilib
 
 swervepy/
 ROBOT_ID

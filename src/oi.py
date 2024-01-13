@@ -95,7 +95,7 @@ class XboxDriver(DriverActionSet):
 
     @property
     def ski_stop(self) -> Trigger:
-        return self.stick.Y()
+        return self.stick.y()
 
     def is_movement_commanded(self):
         return self.forward() + self.strafe() + self.turn() != 0
