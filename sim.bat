@@ -6,6 +6,6 @@
 set original_dir=%CD%
 cd %~dp0\src
 >ROBOT_ID echo %1
-python -m robotpy deploy --skip-tests
+python -m robotpy sim
 del ROBOT_ID
 cd %original_dir%

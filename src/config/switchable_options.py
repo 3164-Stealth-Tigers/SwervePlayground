@@ -1,13 +1,23 @@
+import copy
 import math
 from functools import cache
 from pathlib import Path
 
-import phoenix5
-import rev
 from swervepy import u
-from swervepy.impl import Falcon500CoaxialDriveComponent, Falcon500CoaxialAzimuthComponent, PigeonGyro, \
-    CoaxialSwerveModule, AbsoluteCANCoder, NEOCoaxialDriveComponent, NEOCoaxialAzimuthComponent
-from swervepy.impl.sensor import Pigeon2Gyro
+from swervepy.impl import (
+    Falcon500CoaxialDriveComponent,
+    Falcon500CoaxialAzimuthComponent,
+    PigeonGyro,
+    CoaxialSwerveModule,
+    AbsoluteCANCoder,
+    NEOCoaxialDriveComponent,
+    NEOCoaxialAzimuthComponent,
+    TypicalDriveComponentParameters,
+    TypicalAzimuthComponentParameters,
+    NeutralMode,
+)
+from swervepy.impl.motor import DummyCoaxialDriveComponent, DummyCoaxialAzimuthComponent
+from swervepy.impl.sensor import Pigeon2Gyro, DummyGyro
 from wpimath.geometry import Translation2d, Rotation2d
 
 
@@ -18,7 +28,7 @@ def comp_2023():
         MAX_VELOCITY = 4 * (u.m / u.s)
         MAX_ANGULAR_VELOCITY = 584 * (u.deg / u.s)
 
-        DRIVE_PARAMS = Falcon500CoaxialDriveComponent.Parameters(
+        DRIVE_PARAMS = TypicalDriveComponentParameters(
             wheel_circumference=4 * math.pi * u.inch,
             gear_ratio=6.75 / 1,  # SDS Mk4i L2
             max_speed=MAX_VELOCITY,
@@ -27,7 +37,7 @@ def comp_2023():
             continuous_current_limit=40,
             peak_current_limit=60,
             peak_current_duration=0.01,
-            neutral_mode=phoenix5.NeutralMode.Coast,
+            neutral_mode=NeutralMode.COAST,
             kP=0.1,
             kI=0,
             kD=0,
@@ -36,14 +46,14 @@ def comp_2023():
             kA=0.27464 / 12,
             invert_motor=False,
         )
-        AZIMUTH_PARAMS = Falcon500CoaxialAzimuthComponent.Parameters(
+        AZIMUTH_PARAMS = TypicalAzimuthComponentParameters(
             gear_ratio=150 / 7,  # SDS Mk4i
             max_angular_velocity=MAX_ANGULAR_VELOCITY,
             ramp_rate=0,
             continuous_current_limit=25,
             peak_current_limit=40,
             peak_current_duration=0.01,
-            neutral_mode=phoenix5.NeutralMode.Brake,
+            neutral_mode=NeutralMode.BRAKE,
             kP=0.3,
             kI=0,
             kD=0,
@@ -55,25 +65,26 @@ def comp_2023():
         MODULES = (
             CoaxialSwerveModule(
                 Falcon500CoaxialDriveComponent(4, DRIVE_PARAMS),
-                Falcon500CoaxialAzimuthComponent(3, Rotation2d.fromDegrees(331.435), AZIMUTH_PARAMS, AbsoluteCANCoder(0)),
+                Falcon500CoaxialAzimuthComponent(3, Rotation2d.fromDegrees(0), AZIMUTH_PARAMS, AbsoluteCANCoder(0)),
                 Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
             ),
             CoaxialSwerveModule(
                 Falcon500CoaxialDriveComponent(1, DRIVE_PARAMS),
-                Falcon500CoaxialAzimuthComponent(6, Rotation2d.fromDegrees(156.093), AZIMUTH_PARAMS, AbsoluteCANCoder(1)),
+                Falcon500CoaxialAzimuthComponent(6, Rotation2d.fromDegrees(0), AZIMUTH_PARAMS, AbsoluteCANCoder(1)),
                 Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
             ),
             CoaxialSwerveModule(
                 Falcon500CoaxialDriveComponent(7, DRIVE_PARAMS),
-                Falcon500CoaxialAzimuthComponent(2, Rotation2d.fromDegrees(45.263), AZIMUTH_PARAMS, AbsoluteCANCoder(2)),
+                Falcon500CoaxialAzimuthComponent(2, Rotation2d.fromDegrees(0), AZIMUTH_PARAMS, AbsoluteCANCoder(2)),
                 Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
             ),
             CoaxialSwerveModule(
                 Falcon500CoaxialDriveComponent(5, DRIVE_PARAMS),
-                Falcon500CoaxialAzimuthComponent(0, Rotation2d.fromDegrees(211.201), AZIMUTH_PARAMS, AbsoluteCANCoder(3)),
+                Falcon500CoaxialAzimuthComponent(0, Rotation2d.fromDegrees(0), AZIMUTH_PARAMS, AbsoluteCANCoder(3)),
                 Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2),
             ),
         )
+
     return Inner()
 
 
@@ -84,7 +95,7 @@ def dev_2024():
         MAX_VELOCITY = 4 * (u.m / u.s)  # TODO: Measure
         MAX_ANGULAR_VELOCITY = 584 * (u.deg / u.s)  # TODO: Measure
 
-        DRIVE_PARAMS = NEOCoaxialDriveComponent.Parameters(
+        DRIVE_PARAMS = TypicalDriveComponentParameters(
             wheel_circumference=4 * math.pi * u.inch,
             gear_ratio=6.75 / 1,  # SDS Mk4i L2
             max_speed=MAX_VELOCITY,
@@ -92,7 +103,8 @@ def dev_2024():
             closed_loop_ramp_rate=0,
             continuous_current_limit=40,
             peak_current_limit=60,
-            neutral_mode=rev.CANSparkMax.IdleMode.kCoast,
+            peak_current_duration=0.01,
+            neutral_mode=NeutralMode.COAST,
             kP=0.1,  # TODO: Characterize drivetrain
             kI=0,
             kD=0,
@@ -101,13 +113,14 @@ def dev_2024():
             kA=0,
             invert_motor=False,
         )
-        AZIMUTH_PARAMS = NEOCoaxialAzimuthComponent.Parameters(
+        AZIMUTH_PARAMS = TypicalAzimuthComponentParameters(
             gear_ratio=150 / 7,  # SDS Mk4i
             max_angular_velocity=MAX_ANGULAR_VELOCITY,
             ramp_rate=0,
             continuous_current_limit=25,
             peak_current_limit=40,
-            neutral_mode=rev.CANSparkMax.IdleMode.kBrake,
+            peak_current_duration=0.01,
+            neutral_mode=NeutralMode.BRAKE,
             kP=0.01,
             kI=0,
             kD=0,
@@ -138,12 +151,197 @@ def dev_2024():
                 Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2),
             ),
         )
+
     return Inner()
 
 
-def comp_2024():
+def demo_1():
     class Inner:
-        pass
+        TRACK_WIDTH = (18.75 * u.inch).m_as(u.m)
+        WHEEL_BASE = (18.75 * u.inch).m_as(u.m)
+        MAX_VELOCITY = 4 * (u.m / u.s)
+        MAX_ANGULAR_VELOCITY = 584 * (u.deg / u.s)
+
+        DRIVE_PARAMS = TypicalDriveComponentParameters(
+            wheel_circumference=4 * math.pi * u.inch,
+            gear_ratio=6.75 / 1,  # SDS Mk4i L2
+            max_speed=MAX_VELOCITY,
+            open_loop_ramp_rate=0.25,
+            closed_loop_ramp_rate=0,
+            continuous_current_limit=40,
+            peak_current_limit=60,
+            peak_current_duration=0.01,
+            neutral_mode=NeutralMode.COAST,
+            kP=0.1,
+            kI=0,
+            kD=0,
+            kS=0,
+            kV=0,
+            kA=0,
+            invert_motor=True,
+        )
+        AZIMUTH_PARAMS = TypicalAzimuthComponentParameters(
+            gear_ratio=150 / 7,  # SDS Mk4i
+            max_angular_velocity=MAX_ANGULAR_VELOCITY,
+            ramp_rate=0,
+            continuous_current_limit=25,
+            peak_current_limit=40,
+            peak_current_duration=0.01,
+            neutral_mode=NeutralMode.BRAKE,
+            kP=0.01,
+            kI=0,
+            kD=0,
+            invert_motor=True,
+        )
+
+        GYRO = DummyGyro(0, False)
+
+        MODULES = [
+            CoaxialSwerveModule(
+                NEOCoaxialDriveComponent(1, DRIVE_PARAMS),
+                NEOCoaxialAzimuthComponent(2, Rotation2d.fromDegrees(224.208984), AZIMUTH_PARAMS, AbsoluteCANCoder(1)),
+                Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
+            ),
+            CoaxialSwerveModule(
+                NEOCoaxialDriveComponent(3, DRIVE_PARAMS),
+                NEOCoaxialAzimuthComponent(4, Rotation2d.fromDegrees(72.861328), AZIMUTH_PARAMS, AbsoluteCANCoder(2)),
+                Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+            ),
+            CoaxialSwerveModule(
+                NEOCoaxialDriveComponent(5, DRIVE_PARAMS),
+                NEOCoaxialAzimuthComponent(6, Rotation2d.fromDegrees(97.294922), AZIMUTH_PARAMS, AbsoluteCANCoder(3)),
+                Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
+            ),
+            CoaxialSwerveModule(
+                NEOCoaxialDriveComponent(7, DRIVE_PARAMS),
+                NEOCoaxialAzimuthComponent(8, Rotation2d.fromDegrees(312.451172), AZIMUTH_PARAMS, AbsoluteCANCoder(4)),
+                Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+            ),
+        ]
+
+    return Inner()
+
+
+def demo_2():
+    class Inner:
+        TRACK_WIDTH = (18.75 * u.inch).m_as(u.m)
+        WHEEL_BASE = (18.75 * u.inch).m_as(u.m)
+        MAX_VELOCITY = 4 * (u.m / u.s)
+        MAX_ANGULAR_VELOCITY = 584 * (u.deg / u.s)
+
+        DRIVE_PARAMS = TypicalDriveComponentParameters(
+            wheel_circumference=4 * math.pi * u.inch,
+            gear_ratio=6.75 / 1,  # SDS Mk4i L2
+            max_speed=MAX_VELOCITY,
+            open_loop_ramp_rate=0.25,
+            closed_loop_ramp_rate=0,
+            continuous_current_limit=40,
+            peak_current_limit=60,
+            peak_current_duration=0.01,
+            neutral_mode=NeutralMode.COAST,
+            kP=0.1,
+            kI=0,
+            kD=0,
+            kS=0,
+            kV=0,
+            kA=0,
+            invert_motor=True,
+        )
+        NEO_AZIMUTH_PARAMS = TypicalAzimuthComponentParameters(
+            gear_ratio=150 / 7,  # SDS Mk4i
+            max_angular_velocity=MAX_ANGULAR_VELOCITY,
+            ramp_rate=0,
+            continuous_current_limit=25,
+            peak_current_limit=40,
+            peak_current_duration=0.01,
+            neutral_mode=NeutralMode.BRAKE,
+            kP=0.01,
+            kI=0,
+            kD=0,
+            invert_motor=True,
+        )
+        FALCON_AZIMUTH_PARAMS = TypicalAzimuthComponentParameters(
+            gear_ratio=150 / 7,  # SDS Mk4i
+            max_angular_velocity=MAX_ANGULAR_VELOCITY,
+            ramp_rate=0,
+            continuous_current_limit=25,
+            peak_current_limit=40,
+            peak_current_duration=0.01,
+            neutral_mode=NeutralMode.BRAKE,
+            kP=0.3,
+            kI=0,
+            kD=0,
+            invert_motor=True,
+        )
+
+        GYRO = Pigeon2Gyro(0, False)
+
+        MODULES = [
+            CoaxialSwerveModule(
+                NEOCoaxialDriveComponent(1, DRIVE_PARAMS),
+                NEOCoaxialAzimuthComponent(
+                    2, Rotation2d.fromDegrees(314.6484375), NEO_AZIMUTH_PARAMS, AbsoluteCANCoder(1)
+                ),
+                Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
+            ),
+            CoaxialSwerveModule(
+                NEOCoaxialDriveComponent(3, DRIVE_PARAMS),
+                Falcon500CoaxialAzimuthComponent(
+                    2, Rotation2d.fromDegrees(62.666015625), FALCON_AZIMUTH_PARAMS, AbsoluteCANCoder(2)
+                ),
+                Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+            ),
+            CoaxialSwerveModule(
+                NEOCoaxialDriveComponent(5, DRIVE_PARAMS),
+                NEOCoaxialAzimuthComponent(
+                    6, Rotation2d.fromDegrees(151.5234375), NEO_AZIMUTH_PARAMS, AbsoluteCANCoder(3)
+                ),
+                Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
+            ),
+            CoaxialSwerveModule(
+                NEOCoaxialDriveComponent(7, DRIVE_PARAMS),
+                NEOCoaxialAzimuthComponent(
+                    8, Rotation2d.fromDegrees(34.98046875), NEO_AZIMUTH_PARAMS, AbsoluteCANCoder(4)
+                ),
+                Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+            ),
+        ]
+
+    return Inner()
+
+
+def dummy():
+    class Inner:
+        TRACK_WIDTH = (24.75 * u.inch).m_as(u.m)
+        WHEEL_BASE = (24.75 * u.inch).m_as(u.m)
+        MAX_VELOCITY = 4 * (u.m / u.s)
+        MAX_ANGULAR_VELOCITY = 584 * (u.deg / u.s)
+
+        GYRO = DummyGyro()
+
+        MODULES = (
+            CoaxialSwerveModule(
+                DummyCoaxialDriveComponent(),
+                DummyCoaxialAzimuthComponent(),
+                Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
+            ),
+            CoaxialSwerveModule(
+                DummyCoaxialDriveComponent(),
+                DummyCoaxialAzimuthComponent(),
+                Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+            ),
+            CoaxialSwerveModule(
+                DummyCoaxialDriveComponent(),
+                DummyCoaxialAzimuthComponent(),
+                Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
+            ),
+            CoaxialSwerveModule(
+                DummyCoaxialDriveComponent(),
+                DummyCoaxialAzimuthComponent(),
+                Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+            ),
+        )
+
     return Inner()
 
 
@@ -152,7 +350,9 @@ def comp_2024():
 OPTIONS = {
     "0": comp_2023,
     "1": dev_2024,
-    "2": comp_2024,
+    "2": demo_1,
+    "3": demo_2,
+    "4": dummy,
 }
 
 

@@ -1,25 +1,38 @@
+import traceback
+
 import commands2
 import wpilib
+from commands2.sysid import SysIdRoutine
+from pathplannerlib.auto import AutoBuilder
 
-from swervepy import SwerveDrive
+from swervepy import SwerveDrive, TrajectoryFollowerParameters
 
+from pathplannerlib.path import PathPlannerPath
 from config import switchable_options
 from commands.swerve import ski_stop_command
 from config.global_options import *
-from oi import XboxDriver
+from oi import XboxDriver, PS4Driver
 
 
 class RobotContainer:
     def __init__(self):
+        wpilib.DriverStation.silenceJoystickConnectionWarning(True)
+
         # Driver Xbox controller
-        self.stick = XboxDriver(DRIVER_JOYSTICK)
+        self.stick = PS4Driver(DRIVER_JOYSTICK)
 
         # Load configs for the specific robot this code is deployed to
         # Determined by a value set in the ROBOT_ID file
-        options = switchable_options.get_robot_specific_options()
+        self.options = switchable_options.get_robot_specific_options()
 
         # Construct the swerve drivetrain
-        self.swerve = SwerveDrive(options.MODULES, options.GYRO, options.MAX_VELOCITY, options.MAX_ANGULAR_VELOCITY)
+        self.swerve = SwerveDrive(
+            self.options.MODULES,
+            self.options.GYRO,
+            self.options.MAX_VELOCITY,
+            self.options.MAX_ANGULAR_VELOCITY,
+            TrajectoryFollowerParameters(5, 5, OPEN_LOOP),
+        )
 
         self.teleop_command = self.swerve.teleop_command(
             self.stick.forward,
@@ -35,8 +48,34 @@ class RobotContainer:
 
         self.configure_button_bindings()
 
+        # Load PathPlanner autos
+        self.auto = commands2.Command()
+        try:
+            path = PathPlannerPath.fromPathFile("Around")
+            self.auto = AutoBuilder.followPath(path).beforeStarting(
+                AutoBuilder.resetOdom(path.getStartingHolonomicPose())
+            )
+        except RuntimeError:
+            print(traceback.format_exc())
+
+        # Setup SysId
+        self.sysid_chooser = wpilib.SendableChooser()
+        self.sysid_chooser.addOption(
+            "Quasistatic Forward", self.swerve.sys_id_quasistatic(SysIdRoutine.Direction.kForward)
+        )
+        self.sysid_chooser.addOption(
+            "Quasistatic Reverse", self.swerve.sys_id_quasistatic(SysIdRoutine.Direction.kReverse)
+        )
+        self.sysid_chooser.addOption("Dynamic Forward", self.swerve.sys_id_dynamic(SysIdRoutine.Direction.kForward))
+        self.sysid_chooser.addOption("Dynamic Reverse", self.swerve.sys_id_dynamic(SysIdRoutine.Direction.kReverse))
+        wpilib.SmartDashboard.putData("SysId Chooser", self.sysid_chooser)
+
     def get_autonomous_command(self):
-        return commands2.PrintCommand("Autonomous not implemented!")
+        return self.auto
+
+    def get_test_command(self):
+        # Return a SysId routine command
+        return self.sysid_chooser.getSelected()
 
     def configure_button_bindings(self):
         """Bind buttons on the Xbox controllers to run Commands"""
